@@ -22,7 +22,7 @@ Mandatory parameters, necessary for the module to work correctly.
 ```toml
 [params]
     baseURL = "https://res.cloudinary.com" # This is the same for everyone
-    cloudName = "demo" # You can check your cloud name from cloudinary console page
+    cloudName = "your_cloud_name" # You can check your cloud name from cloudinary console page
 ```
 
 #### Optional 
