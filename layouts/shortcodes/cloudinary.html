@@ -1,0 +1,308 @@
+{{- $cloudName := .Site.Params.cloudName -}}
+{{- $baseURL := .Site.Params.baseURL -}}
+{{- $params := .Params -}}
+{{- $permalink := "" -}}
+{{- $version := ""}}
+{{- $options := ""}}
+{{- $path := "" -}}  
+
+<!--Extension and valid types-->
+{{- $extType := ""}}
+
+{{- $imageExt := .Site.Params.imageExt | default (slice "jpg" "webp" "jpeg" "png") -}}
+{{- $videoExt := .Site.Params.videoExt | default (slice "mp4" "avi" "mkv" "wmv") -}}
+{{- $linkExt := .Site.Params.linkExt | default (slice "pdf" "zip") -}}
+
+<!--Getting the permalink-->
+
+
+{{- if (isset .Params "url")}} <!-- Processing raw via url -->
+    {{if (ne .Params.url "")}} 
+        {{- $extType = path.Ext (.Get "url") | strings.TrimPrefix "."}}
+        {{if eq $extType ""}}
+            {{partial "error/errorcloudinary.html" "No file extension Provided"}}
+        {{else}}
+            {{- $permalink = (.Params.url | safeURL)}}
+        {{end}}
+    {{else}}
+        {{partial "error/errorcloudinary.html" "Invalid URL"}}
+    {{end}}
+
+
+
+{{- else if (isset .Params "src")}} <!-- Parsing using src and based on config values -->
+      {{if(ne .Params.src "")}} 
+    {{- $path := $params.src -}}  
+    <!-- Parsing version (optional parameter) -->
+        {{- if isset .Params "version"}} 
+            {{if ne .Params.version "" }}
+                {{- $version = (printf "%s/" .Params.version)}}
+            {{else}}
+                {{partial "error/errorcloudinary.html" "Version is empty"}}
+            {{end}}
+        {{end}}
+    
+     <!-- Parsing transformations (optional parameter) -->
+        <!-- Angle -->
+        {{- if and (isset .Params "angle") (ne .Params.angle "") }}
+            {{- $temp := (printf "a_%s," .Params.angle) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- AudioCodec -->
+        {{- if and (isset .Params "audioCodec") (ne .Params.audioCodec "") }}
+            {{- $temp := (printf "ac_%s," .Params.audioCodec) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- AudioFrequency -->
+        {{- if and (isset .Params "audioFrequency") (ne .Params.audioFrequency "") }}
+            {{- $temp := (printf "af_%s," .Params.audioFrequency) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- AspectRatio -->
+        {{- if and (isset .Params "aspectRatio") (ne .Params.aspectRatio "") }}
+            {{- $temp := (printf "ar_%s," .Params.aspectRatio) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- BackgroudColor -->
+        {{- if and (isset .Params "background") (ne .Params.background "") }}
+            {{- $temp := (printf "b_%s," .Params.background) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Border -->
+        {{- if and (isset .Params "border") (ne .Params.border "") }}
+            {{- $temp := (printf "b_%s," .Params.border) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Bitrate -->
+        {{- if and (isset .Params "bitrate") (ne .Params.bitrate "") }}
+            {{- $temp := (printf "br_%s," .Params.bitrate) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Crop -->
+        {{- if and (isset .Params "crop") (ne .Params.crop "") }}
+            {{- $temp := (printf "c_%s," .Params.crop) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Color -->
+        {{- if and (isset .Params "color") (ne .Params.color "") }}
+            {{- $temp := (printf "co_%s," .Params.color) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- ColorSpace -->
+        {{- if and (isset .Params "colorSpace") (ne .Params.colorSpace "") }}
+            {{- $temp := (printf "cs_%s," .Params.colorSpace) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- DefaultImage -->
+         {{- if and (isset .Params "default") (ne .Params.default "") }}
+            {{- $temp := (printf "d_%s," .Params.default) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Delay -->
+        {{- if and (isset .Params "delay") (ne .Params.delay "") }}
+            {{- $temp := (printf "dl_%s," .Params.delay) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Density -->
+        {{- if and (isset .Params "density") (ne .Params.density "") }}
+            {{- $temp := (printf "dh_%s," .Params.density) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- DPR -->
+        {{- if and (isset .Params "dpr") (ne .Params.dpr "") }}
+            {{- $temp := (printf "dpr_%s," .Params.dpr) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Duration -->
+        {{- if and (isset .Params "duration") (ne .Params.duration "") }}
+            {{- $temp := (printf "du_%s," .Params.duration) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Effect -->
+        {{- if and (isset .Params "effect") (ne .Params.effect "") }}
+            {{- $temp := (printf "e_%s," .Params.effect) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- EndOffset -->
+        {{- if and (isset .Params "endOffset") (ne .Params.endOffset "") }}
+            {{- $temp := (printf "eo_%s," .Params.endOffset) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Format -->
+        {{- if and (isset .Params "format") (ne .Params.format "") }}
+            {{- $temp := (printf "f_%s," .Params.format) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Flag -->
+        {{- if and (isset .Params "flag") (ne .Params.flag "") }}
+            {{- $temp := (printf "fl_%s," .Params.flag) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- CustomFunction -->
+        {{- if and (isset .Params "customFunction") (ne .Params.customFunction "") }}
+            {{- $temp := (printf "fn_%s," .Params.customFunction) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- FPS -->
+        {{- if and (isset .Params "fps") (ne .Params.fps "") }}
+            {{- $temp := (printf "fps_%s," .Params.fps) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Gravity -->
+        {{- if and (isset .Params "gravity") (ne .Params.gravity "") }}
+            {{- $temp := (printf "g_%s," .Params.gravity) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Height -->
+        {{- if and (isset .Params "height") (ne .Params.height "") }}
+            {{- $temp := (printf "h_%s," .Params.height) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- ifCondition -->
+        {{- if and (isset .Params "ifCondition") (ne .Params.ifCondition "") }}
+            {{- $temp := (printf "if_%s," .Params.ifCondition) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- KeyframeInterval -->
+        {{- if and (isset .Params "keyframeInterval") (ne .Params.keyframeInterval "") }}
+            {{- $temp := (printf "ki_%s," .Params.keyframeInterval) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Layer -->
+        {{- if and (isset .Params "layer") (ne .Params.layer "") }}
+            {{- $temp := (printf "l_%s," .Params.layer) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Opacity -->
+        {{- if and (isset .Params "opacity") (ne .Params.opacity "") }}
+            {{- $temp := (printf "o_%s," .Params.opacity) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Prefix -->
+        {{- if and (isset .Params "prefix") (ne .Params.prefix "") }}
+            {{- $temp := (printf "p_%s," .Params.prefix) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Page -->
+        {{- if and (isset .Params "density") (ne .Params.density "") }}
+            {{- $temp := (printf "dh_%s," .Params.density) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Quality -->
+        {{- if and (isset .Params "quality") (ne .Params.quality "") }}
+            {{- $temp := (printf "q_%s," .Params.quality) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- RoundCorners -->
+        {{- if and (isset .Params "roundCorners") (ne .Params.roundCorners "") }}
+            {{- $temp := (printf "r_%s," .Params.roundCorners) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- StartOffset -->
+        {{- if and (isset .Params "startOffset") (ne .Params.startOffset "") }}
+            {{- $temp := (printf "so_%s," .Params.startOffset) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- StreamingProfile -->
+        {{- if and (isset .Params "streamingProfile") (ne .Params.streamingProfile "") }}
+            {{- $temp := (printf "sp_%s," .Params.streamingProfile) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- NameTransformation -->
+        {{- if and (isset .Params "namedTransformation") (ne .Params.namedTransformation "") }}
+            {{- $temp := (printf "t_%s," .Params.namedTransformation) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Underlay -->
+        {{- if and (isset .Params "underlay") (ne .Params.underlay "") }}
+            {{- $temp := (printf "u_%s," .Params.underlay) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- VideoCodec -->
+        {{- if and (isset .Params "videoCodec") (ne .Params.videoCodec "") }}
+            {{- $temp := (printf "vc_%s," .Params.videoCodec) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- VideoSampling -->
+        {{- if and (isset .Params "videoSampling") (ne .Params.videoSampling "") }}
+            {{- $temp := (printf "vs_%s," .Params.videoSampling) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Width -->
+        {{- if and (isset .Params "width") (ne .Params.width "") }}
+            {{- $temp := (printf "w_%s," .Params.width) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Xcoordinate -->
+        {{- if and (isset .Params "xCoord") (ne .Params.xCoord "") }}
+            {{- $temp := (printf "x_%s," .Params.xCoord) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Ycoordinate -->
+        {{- if and (isset .Params "yCoord") (ne .Params.yCoord "") }}
+            {{- $temp := (printf "y_%s," .Params.yCoord) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+        <!-- Zoom -->
+        {{- if and (isset .Params "zoom") (ne .Params.zoom "") }}
+            {{- $temp := (printf "z_%s," .Params.zoom) }}
+            {{- $options = (printf "%s%s" $options $temp) }}  
+        {{end}}
+
+        {{$options = strings.TrimSuffix "," $options }}
+        {{- $options =  (printf "%s/" $options)}}
+
+     <!-- Parsing extension and getting the permalink -->
+        {{- $extType = path.Ext (.Get "src") | strings.TrimPrefix "."}}
+        {{if eq $extType ""}}
+            {{partial "error/errorcloudinary.html" "No file extension Provided"}}
+        {{else}}
+            {{if or (in $imageExt $extType) (in $linkExt $extType)}}
+                {{- $permalink = (printf "%s/%s/image/upload/%s%s%s" $baseURL $cloudName $options $version $path | safeURL)}}
+            {{else if (in $videoExt $extType)}}
+                {{- $permalink = (printf "%s/%s/video/upload/%s%s%s" $baseURL $cloudName $options $version $path | safeURL)}}
+            {{end}}
+        {{end}}
+
+    {{else}}
+        {{partial "error/errorcloudinary.html" "Invalid src"}}
+
+    {{end}}
+
+{{else}}
+    {{partial "error/errorcloudinary.html" "No url or src provided"}}
+{{end}}
+
+
+<!--Building the elements-->
+
+{{- $text := .Params.text | safeHTML}}
+{{if (in $imageExt $extType )}}
+            <figure>
+                <img src="{{$permalink}}"
+                {{ with .Get "style" }}style="{{ . | safeCSS }}" {{ end }}
+                {{ with .Get "class" }}class="{{ . }}" {{ end }}
+                {{ with .Get "alt" }} alt="{{ . |safeHTML }}" {{ end }}>
+                <figcaption>{{$text}}</figcaption>
+            </figure>
+                
+            {{else if (in $videoExt $extType ) }}
+            <video controls 
+                {{ with .Get "style" }}style="{{ . | safeCSS }}" {{ end }} 
+                {{ with .Get "class" }}class="{{ . | safeCSS }}"{{ end }} 
+                {{ with .Get "alt" }}alt="{{ .  | safeHTML}}" {{ end }}>
+                <source
+                    src="{{$permalink}}"
+                    type="video/{{$extType}}">
+                Your browser does not support the video tag.
+            </video>
+            {{else if ((in $linkExt $extType ))}}
+                
+                <a href="{{$permalink}}" 
+                {{ with .Get "style" }}style="{{ . | safeCSS }}" {{ end }}
+                {{ with .Get "class" }}class="{{ . | safeCSS}}" {{ end }}
+                {{ with .Get "alt" }} alt="{{ . | safeHTML}}" {{ end }}>
+                {{ $text | default ($permalink) }}</a>
+            {{else}}
+                {{partial "error/errorcloudinary.html" (printf "Invalid File Extension .%s " $extType)}}
+{{end}}
